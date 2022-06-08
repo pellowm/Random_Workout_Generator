@@ -1,4 +1,4 @@
-# Random WOD
+# Random Workout Generator
 
 ## Description:
 This is a workout management tool.  Users can randomly generate a workout requiring only the equipment that they have on hand.  They then have the option to save this workout for future use.
