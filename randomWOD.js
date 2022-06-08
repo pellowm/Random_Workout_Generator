@@ -1,7 +1,12 @@
 // initialize the database connection
 var mysql = require('mysql');
-var db = require('./dbconfig.js')
-var pool = mysql.createPool(db.config); 
+var pool = mysql.createPool({
+  connectionLimit : 10,
+  host            : process.env.DB_HOST,
+  user            : process.env.DB_USER,
+  password        : process.env.DB_PASSWORD,
+  database        : process.env.DB_NAME
+}); 
 
 // express web application framework
 var express = require('express');  // typeof express is a function
@@ -48,7 +53,7 @@ app.get('/',function(req,res){
 	});
 });
 
-app.get('/previous',function(req,res){
+app.get('/existing_workouts',function(req,res){
 
 	pool.query('SELECT movement_name FROM wodmovements ORDER BY movement_name ASC', function(err, rows, fields){
 		
@@ -85,7 +90,7 @@ app.get('/previous',function(req,res){
 			rows.forEach((item) => { wArray.push(item.WOD_name)});
 
 			// previous.handlebars
-			res.render('previous', {id: ['1','2','3'], movements:mArray, wodNames:wArray}); 
+			res.render('existing_workouts', {id: ['1','2','3'], movements:mArray, wodNames:wArray}); 
 		});
 	});
 });
@@ -98,10 +103,7 @@ app.get('/terms',function(req,res){
 	res.render('terms');
 });
 
-app.get('/privacy',function(req,res){
-	res.render('privacy');
-});
-app.get('/findwod',function(req,res){
+app.get('/wod',function(req,res){
 
 	console.log(req.query.wodName);
 
@@ -120,9 +122,9 @@ app.get('/findwod',function(req,res){
 
 });
 
-app.post('/getwod', function(req,res){
+app.post('/wod/random', function(req,res){
 
-	console.log("received post request to get WOD");
+	console.log("received post request to create random WOD");
 
 	// logs the post body
 	for (var p in req.body)
@@ -202,7 +204,7 @@ app.post('/getwod', function(req,res){
 	});
 });
 
-app.post('/savewod', function(req,res){
+app.post('/wod', function(req,res){
 
 	console.log("received post request to save WOD");
 
@@ -231,19 +233,20 @@ app.post('/savewod', function(req,res){
 			
 			return;
 		}
-		console.log("saved WOD inserted into database");
+		console.log("saved random WOD inserted into database");
 
 		res.send("success");
 	});
 });
 
-app.post('/savemove', function(req,res) {
+app.post('/wod/custom', function(req,res) {
 
 	console.log(req.body);
 	req.body.WODname = req.body.WODname.toUpperCase();
 	var movements = [];
 	for (var i = 1; i < 4; i++)
 	{
+		// 
 		if (((req.body["Mweight_"+i] == 0) && (req.body["Wweight_"+i] == 0)) || ((req.body["Mweight_"+i] === "") && (req.body["Wweight_"+i] === "")))
 		{
 			movements.push(req.body["reps_"+i] + " " + req.body["units_"+i] + " " + req.body["movement_"+i]);
@@ -276,7 +279,7 @@ app.post('/savemove', function(req,res) {
 			
 			return;
 		}
-		console.log("saved WOD inserted into database");
+		console.log("saved custom WOD inserted into database");
 		res.send("success");
 	});	
 });
@@ -284,8 +287,6 @@ app.post('/savemove', function(req,res) {
 app.get('/dogs',function(req,res){
 	res.render('dogs');
 });
-
-
 
 // error handler for missing page
 app.use(function(req,res){

@@ -11,7 +11,7 @@ getEquip();
 function getEquip()
 {
   var getWOD = document.createElement("button");
-  getWOD.textContent = "Get W.O.D.!";
+  getWOD.textContent = "Create Random W.O.D.!";
   getWOD.className = "buttons btn btn-primary btn-lg";
   getWOD.addEventListener("click", getWODClick);
   document.getElementById("equipDiv").appendChild(getWOD);
@@ -56,7 +56,7 @@ function getWODClick()
 
     });
 
-    req.open("POST", "/getwod", true);
+    req.open("POST", "/wod/random", true);
     req.setRequestHeader('Content-Type', 'application/json');
     req.send(JSON.stringify(userEquipment));
     
@@ -64,7 +64,7 @@ function getWODClick()
     // browser will call event listenener when http response is received
 }
 
-function loadWODTable(threeMoveObj) 
+function loadWODTable(threeMoveObj)
 {  
   //clear out any previous WODs
   document.getElementById("tableDiv").innerHTML = "";
@@ -178,7 +178,7 @@ function saveWODClick(e)
 
   //send the WOD data
   var req = new XMLHttpRequest();
-  req.open("POST", "/savewod", true);
+  req.open("POST", "/wod", true);
   req.setRequestHeader('Content-Type', 'application/json');
   req.addEventListener('load',function(){
 
